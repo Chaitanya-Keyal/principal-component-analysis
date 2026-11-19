@@ -120,5 +120,7 @@ Largest loadings:
   (`src/common/pca.py`) multiplies every eigenvalue by 123/124 and leaves U and the r_j alone.
   Changing `ddof=1` to `ddof=0` in `z_score` as well brings the eigenvalues back: S is then the
   correlation matrix again, which does not depend on the divisor.
-- Skip the sign rule: return `U[:, ::-1]` without `fix_signs` in `eigendecomposition`. Some
-  columns flip sign; nothing else changes.
+- Skip the sign rule: return `U[:, ::-1]` without `fix_signs` in `eigendecomposition`. The
+  columns whose largest entry came out negative keep that sign (10 of the 13 here), so their
+  loadings change sign and the comparison with scikit-learn no longer agrees for them. The
+  eigenvalues and every variance stay the same.

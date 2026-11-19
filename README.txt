@@ -13,15 +13,17 @@ Report
 
 Versions used
   Python 3.12.10, numpy 2.5.5, matplotlib 3.11.2, scikit-learn 1.9.1. The code imports only
-  these, threadpoolctl (installed with scikit-learn) and the Python standard library.
+  these, threadpoolctl (installed with scikit-learn) and the Python standard library. It also
+  runs on numpy 1.26, matplotlib 3.8 and scikit-learn 1.5, with every 4-decimal number unchanged;
+  only the residuals near 1e-15, which rounding alone sets, come out with different digits.
 
 How to run
   From this folder, with uv (uv.lock pins every version):
 
     uv sync
-    uv run python -m src.run          all four problems, about 5 s
+    uv run python -m src.run          all four problems, a few seconds
     uv run python -m src.run p2 p3    some of them
-    uv run pytest                     33 tests against hand-worked values and scikit-learn
+    uv run pytest                     34 tests against hand-worked values and scikit-learn
 
   or, with any Python 3.12+ that has numpy, matplotlib and scikit-learn: python -m src.run
 
@@ -44,19 +46,23 @@ What is where
                            features as scikit-learn's SequentialFeatureSelector
   notebooks/demo.ipynb     the demo: calls src/ and shows each problem's figures and numbers
 
-Choices the handout leaves open
+Conventions C1 to C6, as implemented
   - Every statistic comes from the training set: means, standard deviations, minima and maxima,
     eigenvectors, F-scores and the forward-selection order. Test points are only transformed.
-    Min-max test values outside [0, 1] are left as they are.
+  - Standard deviations and S use the divisor N - 1; eigenvalues come from numpy.linalg.eigh,
+    sorted in descending order.
   - The sign rule (largest absolute entry positive) is applied to every decomposition, including
     the rows of scikit-learn's components_ before the comparison in P1.
+  - J is computed from the reconstructions themselves, with divisor 123 for the training set and
+    53 for the test set.
+
+Choices the handout leaves open
   - P2: the scree plot and the cumulative plot are the two panels of one figure, and the scree
-    plot also marks the 0.10 threshold that defines the elbow. J is computed from the
-    reconstructions themselves, with divisor 123 for the training set and 53 for the test set.
-  - P3: each panel of the projection figure carries its own legend.
-  - P4: forward selection is our own implementation, scored with cross_val_score on the fixed
-    folds; it is run once to k = 8 and the smaller sets are its first k features. The selected
-    columns reach the classifier in increasing column index. "Within one test sample of the
-    baseline" is decided on counts of correct test predictions, not on rounded accuracies.
-    Linear-algebra threads are limited to one during forward selection, which changes its speed
-    only.
+    plot also marks the 0.10 threshold that defines the elbow.
+  - P3: min-max test values outside [0, 1] are left as they are. Each panel of the projection
+    figure carries its own legend.
+  - P4: forward selection is our own loop, scored with cross_val_score on the fixed folds; it is
+    run once to k = 8 and the smaller sets are its first k features. The selected columns reach
+    the classifier in increasing column index. "Within one test sample of the baseline" is
+    decided on counts of correct test predictions, not on rounded accuracies. Linear-algebra
+    threads are limited to one during forward selection, which changes its speed only.

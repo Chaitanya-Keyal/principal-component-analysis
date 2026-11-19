@@ -115,13 +115,16 @@ Forward-selection order: `flavanoids`, `alcohol`, `alcalinity_of_ash`, `proantho
    well as `flavanoids`, the best single feature by both supervised methods (0.8519). The reason is
    how the features are built: k components draw on all 13 features, k selected features draw
    on k. And on this data the high-variance directions happen to separate the classes (the V3
-   picture in P3). Where the labels do show is the wrapper: its cross-validated accuracy on the
-   training set reaches 1.0000 at k = 8, yet it is the lowest of the three on the test set from
-   k = 2 on. It fits its choices to the 124 training wines.
+   picture in P3). Where the labels do show is the wrapper: it is the lowest of the three on
+   the test set from k = 2 on, although its cross-validated accuracy on the training set is
+   higher (0.9517, 0.9597 and 1.0000 at k = 3, 5 and 8, against 0.8704, 0.9074 and 0.9630 on the
+   test set). It fits its choices to the 124 training wines.
 3. **How confident can we be with 54 test wines?** Not very. One wine is 1/54 = 0.0185. The
    standard error of an accuracy near 0.95 is √(0.95 × 0.05 / 54) ≈ 0.03, more than one wine.
-   Gaps of one or two wines (PCA and the filter from k = 5 on) mean nothing. Only the gaps at
-   k = 3 (4 and 6 wines) hint at a real difference, and they come from a single split.
+   Gaps of one or two wines (PCA and the filter from k = 5 on) mean nothing. Only the gaps of
+   four to six wines hint at a real difference: PCA over the filter at k = 3 (4), PCA over the
+   wrapper at k = 3 (6) and k = 5 (5), and the filter over the wrapper at k = 5 (4). Even those
+   come from a single split.
 
 ## Demo
 

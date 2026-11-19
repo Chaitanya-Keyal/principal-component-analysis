@@ -62,7 +62,7 @@ from another folder instead.
 ## 4. Running
 
 ```bash
-uv run python -m src.run              # all four problems, about 5 s
+uv run python -m src.run              # all four problems, a few seconds
 uv run python -m src.run p2 p3        # some of them
 uv run python -m src.run --out DIR    # write results/ and figures/ under DIR instead
 ```

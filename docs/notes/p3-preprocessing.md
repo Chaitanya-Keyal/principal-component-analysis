@@ -7,8 +7,8 @@ feature has much bigger numbers than the rest, PCA simply reports that feature. 
 (centred-only) wine data `proline` holds 99.7% of all the variance, so PC1 is the proline axis
 and two components "explain" 99.98% of the variance, yet a 5-NN classifier on that 2-D picture
 gets only 0.7222. After min-max scaling or z-scoring, two components explain far less variance
-(0.6113 and 0.5494) but the three classes separate cleanly and the accuracy is 0.9815 and
-0.9444. **High variance captured does not mean useful structure.**
+(0.6113 and 0.5494) but the three classes form three separate clouds and the accuracy is
+0.9815 and 0.9444. **High variance captured does not mean useful structure.**
 
 ## The three variants
 
@@ -65,9 +65,10 @@ Reading the figure (`p3_projections`): filled circles are training wines, crosse
 colour is the class.
 
 - **V1:** the horizontal axis is essentially proline. Class 0 sits to the right (high proline)
-  but classes 1 and 2 lie on top of each other, so nearest neighbours confuse them.
-- **V2 and V3:** three separate clouds in a rough arch. Test crosses fall inside the cloud of
-  their own colour.
+  but classes 1 and 2 lie on top of each other, so nearest neighbours confuse them: 11 of V1's
+  15 test errors are between those two classes.
+- **V2 and V3:** three separate clouds in a rough arch. Nearly every test cross falls inside
+  the cloud of its own colour (1 test error for V2, 3 for V3).
 
 ## The three questions in the paragraph
 
@@ -118,5 +119,7 @@ colour is the class.
 - A fourth variant, for example dividing by the range without shifting: add a function with the
   signature `f(X_train, X)` and an entry in `VARIANTS`; the figure needs a fourth panel
   (`plt.subplots(1, 4, ...)`).
-- Show what scaling one feature does: multiply a column of `X` and `X_test` by 100 at the top of
-  `compute` and watch r₁ of V1 head for 1 while V3 does not move.
+- Show what scaling one feature does: multiply the `hue` column of `X` and `X_test` by 10,000
+  at the top of `compute`. In V1, PC1 switches from `proline` to `hue` with r₁ = 0.9832; V3 does
+  not change at all. A smaller factor is not enough: hue's raw variance is only 0.0529, so it
+  has to be scaled a long way before it passes proline's 94906.7.

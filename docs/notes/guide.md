@@ -97,8 +97,8 @@ were dropped. We verify that to 3.6e-15.
 
 **The test set.** Its error also falls every time a component is added, down to 0 at k = 13.
 The proof is one line: adding a component removes a sum of squares from the error, and a sum of
-squares cannot be negative. The test curve sits slightly above the training curve, because the
-axes were fitted to the training wines.
+squares cannot be negative. The test curve sits above the training curve: the axes are the ones
+that make the *training* error as small as possible, and the test wines get no such guarantee.
 
 ---
 
@@ -152,13 +152,16 @@ on all 13 features: 0.9815, which is 53 of the 54 test wines.
 | 8 | 0.9815 | 0.9815 | 0.9630 |
 
 **What it shows.**
-- PCA matches the baseline with 3 components. The filter needs 5 features, the wrapper 8.
+- PCA matches the baseline with 3 components and the filter with 5 features. The wrapper never
+  quite does: at 8 features it is one wine short.
 - PCA never sees the class labels, yet it is never below the two methods that do. Each component
   mixes all 13 features, while a selected feature is just one of them.
-- The wrapper looks best on the training data (cross-validated accuracy 1.0000 at k = 8) and
-  worst on the test data. It tuned its choices to the 124 training wines.
-- **Do not over-read it.** One test wine is 0.0185 of accuracy. Differences of one or two wines
-  are noise. Only the gaps at k = 3 (4 and 6 wines) are worth mentioning.
+- The wrapper scores well on the training data (cross-validated accuracy 0.9517, 0.9597 and
+  1.0000 at k = 3, 5 and 8) and lowest of the three on the test data (0.8704, 0.9074, 0.9630).
+  It tuned its choices to the 124 training wines.
+- **How far to trust it.** One test wine is 0.0185 of accuracy. Differences of one or two wines
+  are noise. Only the gaps of four to six wines are worth mentioning: PCA ahead of the filter
+  at k = 3, PCA ahead of the wrapper at k = 3 and 5, the filter ahead of the wrapper at k = 5.
 
 **Why a greedy search.** Trying every subset of 13 features means 8191 subsets. Forward selection
 tries 13, then 12, then 11, ...: 76 subsets to reach k = 8.
@@ -261,7 +264,8 @@ uv run --group notebook jupyter lab notebooks/demo.ipynb
 9. **How can PCA match methods that use the labels?** Its components combine all features, and
    on this data the directions of large variance are also the ones that separate the classes.
 10. **Can you rank the three methods from these results?** Not reliably. One test wine is 1.85
-    percentage points, and most gaps are one or two wines.
+    percentage points, and most gaps are one or two wines. The largest is 6 wines, between PCA
+    and the wrapper at k = 3.
 
 The other files in this folder go deeper on each of these, with more questions and the code
 behind every number.

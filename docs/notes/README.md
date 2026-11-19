@@ -5,7 +5,7 @@ presenting the work. Not part of the submission. Every member may be asked about
 read them in this order:
 
 - [guide.md](guide.md): the whole assignment in plain language, then a script for showing the
-  notebook and ten likely questions. Start here.
+  notebook and ten likely questions; the first file to read
 - [assignment.md](assignment.md): what is asked, the rules that apply everywhere (C1 to C6), and
   where each deliverable lives in the repo
 - [pca-basics.md](pca-basics.md): variance, covariance, standardising, eigenvectors and the sign
@@ -21,8 +21,8 @@ read them in this order:
 
 Every problem file opens with an In short, then follows the same order: the idea in plain words,
 the maths, the code, our numbers, the demo, likely questions with answers, and the code changes
-most likely to be asked for (with where to make them). Make changes in the notebook, or run them
-with `src.run --out /tmp/demo`, so the repo's results and figures are not overwritten.
+most likely to be asked for (with where to make them). A change is best run in the notebook or
+with `src.run --out /tmp/demo`, so that the repo's results and figures are not overwritten.
 
 **The numbers are provisional.** The course has not released `wine_train.csv` and
 `wine_test.csv` yet. Every number in these notes comes from a provisional 124/54 split of the

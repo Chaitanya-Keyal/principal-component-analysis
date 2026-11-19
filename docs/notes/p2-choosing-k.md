@@ -68,8 +68,11 @@ component, which does not happen with real data. At k = 13 nothing is discarded,
 
 Step 4 does *not* carry over to the test set: the test points were not used to compute S, so
 their average squared score along u_j is not λ_j. That is why J_test is not equal to the
-eigenvalue sum, and why it sits a little above J_train here (the axes were fitted to the
-training points).
+eigenvalue sum. Here it is above J_train at every k, for two reasons. The test points have more
+total spread when measured in training units (with no components at all, J_test(0) = 14.0807
+against 13). And U_k is the choice of k directions that makes the *training* error as small as
+possible; the test points get no such guarantee, so the gap widens as k grows (J_test is 2%
+above J_train at k = 1 and about 90% above at k = 11).
 
 ## The code
 
@@ -108,7 +111,8 @@ def reconstruction_error(Z, U_k):
 | 12 | 0.0109 | 0.9927 | 0.0947 | 0.1726 |
 | 13 | 0.0073 | 1.0000 | 0.0000 | 0.0000 |
 
-Check a row by hand: J_train(1) = 13 − 4.6450 = 8.3550, and 8.3550 / 13 = 0.6427 = 1 − 0.3573.
+One row checked by hand: J_train(1) = 13 − 4.6450 = 8.3550, and 8.3550 / 13 = 0.6427 =
+1 − 0.3573.
 
 ## Demo
 
@@ -130,9 +134,10 @@ Check a row by hand: J_train(1) = 13 − 4.6450 = 8.3550, and 8.3550 / 13 = 0.64
   eigenvalues were computed from the training points, so λ_j is the training variance along u_j.
   The test points have their own variance along u_j.
 - *Can the test error go up when a component is added?* No. The drop is a sum of squares.
-- *Why is J_test above J_train?* The directions were chosen to capture the training variance.
-  The test points are also centred and scaled with training statistics, so they are not exactly
-  mean 0 and variance 1.
+- *Why is J_test above J_train?* The test points are centred and scaled with training
+  statistics, so they are not exactly mean 0 and variance 1; here their total spread is 14.0807
+  against 13. And U_k minimises the training error, not the test error, so the gap grows with
+  k.
 - *What would J(0) be?* Reconstructing with no components gives ẑ = 0, so J_train(0) = tr(S) =
   13.
 - *Why is the reconstruction U_k U_kᵀ z and not an inverse?* The columns of U_k are orthonormal,

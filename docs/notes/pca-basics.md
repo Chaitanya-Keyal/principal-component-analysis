@@ -63,9 +63,10 @@ For a covariance matrix they have a concrete meaning:
 - The eigenvector with the largest λ is the direction along which the wines differ the most.
   That is **PC1**. The next largest, at right angles to it, is **PC2**, and so on.
 
-Because S is symmetric, its eigenvalues are real and non-negative (a variance cannot be
-negative) and its eigenvectors can be chosen perpendicular to each other with length 1. Stacked
-as columns they form U, and UᵀU = I.
+Because S is symmetric, its eigenvalues are real and its eigenvectors can be chosen
+perpendicular to each other with length 1. Because S is a covariance matrix, the eigenvalues are
+also never negative: each one is a variance. Stacked as columns the eigenvectors form U, and
+UᵀU = I.
 
 In the code: `eigendecomposition(S)` calls `np.linalg.eigh`, which is made for symmetric
 matrices and returns eigenvalues in *ascending* order; we reverse them and apply the sign rule.
