@@ -1,0 +1,409 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+
+\captionsetup{font=small,labelfont=bf}
+\setlist{nosep}
+
+% Every number comes from results/numbers.tex, written by `python -m src.run`; a mistyped key
+% prints a bold ??.
+\makeatletter
+\newcommand{\resdef}[2]{\@namedef{res@#1}{#2}}
+\newcommand{\res}[1]{\@ifundefined{res@#1}{\textbf{??}}{\@nameuse{res@#1}}}
+\newcommand{\resrows}[1]{\@ifundefined{res@#1}{\textbf{??} \\}{\@nameuse{res@#1}}}% table rows
+\makeatother
+\input{../results/numbers.tex}
+\newcommand{\fig}[2][\linewidth]{\includegraphics[width=#1]{../figures/#2.pdf}}
+
+\newcommand{\T}{\top}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\z}{\mathbf{z}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\cc}{\mathbf{c}}
+\newcommand{\xbar}{\bar{\mathbf{x}}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+\newcommand{\kelbow}{k_{\mathrm{elbow}}}
+\newcommand{\Jtrain}{J_{\mathrm{train}}}
+\newcommand{\Jtest}{J_{\mathrm{test}}}
+
+\title{\vspace{-1.5cm}CS F320 Foundations of Data Science\\[2pt]
+  \Large Assignment 2: Principal Component Analysis}
+\author{%
+  \begin{tabular}{ll}
+    Chaitanya Keyal & 2023B4A70727H \\
+    Abhishek Verma & 2023B4A71256H \\
+    Palash Jain & 2023A2B51271H
+  \end{tabular}}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Implementation}
+
+Everything is written in Python~3.12. The covariance matrix, its eigendecomposition, the
+projections and reconstructions, the three preprocessing variants, the F-scores and sequential
+forward selection are our own NumPy code. scikit-learn is used only where the assignment names
+it: \texttt{PCA} for the verification in P1, \texttt{KNeighborsClassifier} in P3, and
+\texttt{LogisticRegression} with \texttt{StratifiedKFold} cross-validation in P4. The code, the
+data and every output are at
+\begin{center}\url{https://github.com/Chaitanya-Keyal/principal-component-analysis}\end{center}
+\texttt{src/p1.py} to \texttt{src/p4.py} hold one problem each, \texttt{src/common/pca.py} the
+shared PCA code, and \texttt{python -m src.run} regenerates every number and figure in this
+report from the two provided CSV files, which are loaded as given.
+
+The conventions C1 to C6 hold throughout. Every statistic is computed on the
+$N = \res{p2-n-train}$ training samples and applied unchanged to the $\res{p2-n-test}$ test
+samples. Standard deviations and $S$ use the divisor $N - 1$. Eigenvalues and eigenvectors come
+from \texttt{numpy.linalg.eigh}, sorted in descending order, and every eigenvector, including
+those returned by scikit-learn, is flipped so that its entry of largest absolute value is
+positive. Numbers are given to 4 decimal places, and the residuals that are compared with
+$10^{-8}$ in scientific notation. Nothing is random except the cross-validation folds of P4,
+which use the seed the assignment fixes (\texttt{random\_state=0}).
+
+%==============================================================================================
+\section{P1: PCA from first principles}
+
+\paragraph{Derivation.} Let $\uu$ be a unit vector. The projections $\uu^\T\x_n$ of the data
+have mean $\uu^\T\xbar$, and because $\uu^\T\mathbf{a} = \mathbf{a}^\T\uu$ for any vector
+$\mathbf a$, each squared deviation is
+$(\uu^\T\x_n - \uu^\T\xbar)^2 = \uu^\T(\x_n - \xbar)(\x_n - \xbar)^\T\uu$. Summing over $n$ and
+dividing by $N - 1$, the variance of the projections is
+\[
+  \frac{1}{N-1}\sum_{n=1}^{N}\bigl(\uu^\T\x_n - \uu^\T\xbar\bigr)^2 = \uu^\T S\,\uu,
+  \qquad
+  S = \frac{1}{N-1}\sum_{n=1}^{N}(\x_n - \xbar)(\x_n - \xbar)^\T .
+\]
+The first principal direction maximises $\uu^\T S\uu$ subject to $\uu^\T\uu = 1$. With the
+Lagrangian $\mathcal L(\uu, \lambda) = \uu^\T S\uu + \lambda(1 - \uu^\T\uu)$,
+\[
+  \nabla_{\uu}\mathcal L = 2S\uu - 2\lambda\uu = \mathbf 0
+  \quad\Longrightarrow\quad S\uu = \lambda\uu ,
+\]
+so every stationary point is an eigenvector of $S$. Multiplying on the left by $\uu^\T$ gives
+$\uu^\T S\uu = \lambda$: the variance along an eigenvector is its eigenvalue, and the maximum is
+the largest eigenvalue $\lambda_1$, reached at its eigenvector $\uu_1$.
+
+For the second direction we add the constraint $\uu^\T\uu_1 = 0$ with a multiplier $\eta$, which
+gives $2S\uu - 2\lambda\uu + \eta\,\uu_1 = \mathbf 0$. Multiplying on the left by $\uu_1^\T$, the
+first term is $2\uu_1^\T S\uu = 2(S\uu_1)^\T\uu = 2\lambda_1\uu_1^\T\uu = 0$ because $S$ is
+symmetric, the second is $0$ by the constraint, and the third is $\eta$, so $\eta = 0$ and again
+$S\uu = \lambda\uu$. Among the eigenvectors orthogonal to $\uu_1$ the largest variance is
+$\lambda_2$, at $\uu_2$, and the same argument with one multiplier per earlier component gives
+$\uu_3, \dots, \uu_D$.
+
+Finally, with $S = U\Lambda U^\T$ and $U^\T U = I$, $\tr(S) = \tr(\Lambda U^\T U) =
+\sum_j\lambda_j$. The trace is also the sum of the per-feature variances $\sum_j s_j^2$, and
+after standardisation every $s_j^2 = 1$, so $\sum_j\lambda_j = D = 13$.
+
+\paragraph{Implementation.} The 13 training features are standardised as $z_{nj} =
+(x_{nj} - \mu_j)/s_j$. \texttt{covariance} centres the data and forms
+$S = \tilde X^\T\tilde X/(N - 1)$, and \texttt{eigendecomposition} calls
+\texttt{numpy.linalg.eigh}, reverses its ascending order and applies the sign rule. The class
+column is not read by this problem. The program prints the eigenvalues as follows.
+
+\begin{center}
+\begin{minipage}{0.32\linewidth}
+\VerbatimInput[fontsize=\small]{../results/p1.txt}
+\end{minipage}
+\end{center}
+
+\paragraph{Checks.} Table~\ref{tab:p1-checks} gives the two checks on our own decomposition and
+the comparison with \texttt{PCA(n\_components=13, svd\_solver="full")} fitted on the same
+standardised data, after the sign rule has been applied to the rows of \texttt{components\_}.
+$\tr(S) = \res{p1-trace}$, as derived above. All four residuals are far below $10^{-8}$, so $U$
+is orthonormal, the eigenvalues sum to the trace, and our eigenvalues and eigenvectors agree
+with the library's.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{lc}
+    \toprule
+    Quantity & Value \\
+    \midrule
+    $\norm{U^\T U - I}_F$ & \res{p1-orth} \\
+    $\tr(S)$ & $\res{p1-trace}$ \\
+    $\bigl|\tr(S) - \sum_j\lambda_j\bigr|$ & \res{p1-trace-diff} \\
+    $\max_j\bigl|\lambda_j - \texttt{explained\_variance\_}_j\bigr|$ & \res{p1-lib-eigenvalues} \\
+    $\max_{ij}\bigl|U_{ij} - (\texttt{components\_}^\T)_{ij}\bigr|$ & \res{p1-lib-eigenvectors} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Checks on the decomposition and its largest absolute differences from scikit-learn.}
+  \label{tab:p1-checks}
+\end{table}
+
+\paragraph{Loadings.} Table~\ref{tab:p1-loadings} lists $\uu_1$ and $\uu_2$. The three features
+with the largest $|\text{loading}|$ on PC1 are \res{p1-top-pc1}, and on PC2 they are
+\res{p1-top-pc2}.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{lrr}
+    \toprule
+    Feature & $\uu_1$ (PC1) & $\uu_2$ (PC2) \\
+    \midrule
+    \resrows{p1-loading-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{Loadings of the first two principal components.}
+  \label{tab:p1-loadings}
+\end{table}
+
+%==============================================================================================
+\section{P2: Variance captured vs.\ number of components}
+
+\paragraph{Method.} With $r_j = \lambda_j/\sum_i\lambda_i$ and $R(k) = \sum_{j\le k} r_j$, we
+report $k_\tau = \min\{k : R(k) \ge \tau\}$ for $\tau \in \{0.80, 0.90, 0.95\}$, the Kaiser count
+(components with $\lambda_j > \tr(S)/D$) and $\kelbow = \max\{k : r_k \ge 0.10\}$. A standardised
+point is projected and reconstructed as $\hat\z_n = U_kU_k^\T\z_n$ with $U_k = [\uu_1, \dots,
+\uu_k]$, and the reconstruction error of a set of $n_{\mathcal D}$ points is
+$J_{\mathcal D}(k) = \frac{1}{n_{\mathcal D} - 1}\sum_n\norm{\z_n - \hat\z_n}^2$. Test points are
+standardised with the training mean and standard deviation and use the training $U$.
+
+The eigenvectors form an orthonormal basis, so $\z_n = \sum_{j=1}^{D}(\uu_j^\T\z_n)\uu_j$ and the
+rank-$k$ reconstruction keeps the first $k$ terms. The residual is $\z_n - \hat\z_n =
+\sum_{j>k}(\uu_j^\T\z_n)\uu_j$, and by orthonormality $\norm{\z_n - \hat\z_n}^2 =
+\sum_{j>k}(\uu_j^\T\z_n)^2$. The standardised training data has zero mean, so
+$\frac{1}{N-1}\sum_n(\uu_j^\T\z_n)^2 = \uu_j^\T S\uu_j = \lambda_j$, and summing over the training
+set
+\[
+  \Jtrain(k) = \sum_{j=k+1}^{D}\lambda_j, \qquad \frac{\Jtrain(k)}{\tr(S)} = 1 - R(k):
+\]
+the variance the first $k$ components do not capture is exactly the reconstruction error. For
+standardised data $\tr(S)/D = 1$, so the Kaiser criterion keeps the components with
+$\lambda_j > 1$.
+
+\paragraph{Results.} Figure~\ref{fig:p2-variance} shows the scree plot and the cumulative
+variance. The elbow rule gives $\kelbow = \res{p2-k-elbow}$. The thresholds are reached at
+$k_{0.80} = \res{p2-k80}$, $k_{0.90} = \res{p2-k90}$ and $k_{0.95} = \res{p2-k95}$, and the Kaiser
+criterion retains $\res{p2-kaiser}$ components. Table~\ref{tab:p2} lists $r_k$, $R(k)$ and both
+reconstruction errors, each computed directly from the reconstructions $\hat\z_n$, and
+Figure~\ref{fig:p2-reconstruction} plots the two errors. For the identity derived above,
+\[
+  \max_{k=1,\dots,13}\Bigl|\Jtrain(k) - \sum_{j>k}\lambda_j\Bigr| = \text{\res{p2-identity}},
+\]
+which is below $10^{-8}$, so the two sides agree.
+
+\begin{figure}[H]
+  \centering\fig{p2_variance}
+  \caption{Left: explained variance ratio $r_j$ of each component, with the elbow
+    $\kelbow = \res{p2-k-elbow}$. Right: cumulative ratio $R(k)$ with the reference levels 0.80,
+    0.90 and 0.95.}
+  \label{fig:p2-variance}
+\end{figure}
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{rcccc}
+    \toprule
+    $k$ & $r_k$ & $R(k)$ & $\Jtrain(k)$ & $\Jtest(k)$ \\
+    \midrule
+    \resrows{p2-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{Explained variance and reconstruction error for every $k$.}
+  \label{tab:p2}
+\end{table}
+
+\begin{figure}[H]
+  \centering\fig[0.7\linewidth]{p2_reconstruction}
+  \caption{Reconstruction error of the training and the test set against $k$.}
+  \label{fig:p2-reconstruction}
+\end{figure}
+
+\paragraph{Discussion.} (i) The elbow rule gives $\kelbow = \res{p2-k-elbow}$ and the Kaiser
+criterion also keeps $\res{p2-kaiser}$ components, fewer than $k_{0.80} = \res{p2-k80}$,
+$k_{0.90} = \res{p2-k90}$ and $k_{0.95} = \res{p2-k95}$. Since $R(\kelbow) = \res{p2-R-elbow}$,
+the elbow keeps every component that explains at least a tenth of the variance but leaves
+$\res{p2-tail-elbow}$ of the total variance in the discarded tail, so it suits a compact
+description of the data and not an accurate reconstruction. (ii) $\Jtest(k)$ is non-increasing in
+$k$: the residual expression holds for any point, so $\Jtest(k) - \Jtest(k+1) =
+\frac{1}{n_{\mathcal D} - 1}\sum_n(\uu_{k+1}^\T\z_n)^2 \ge 0$. Figure~\ref{fig:p2-reconstruction}
+shows this, with both curves falling at every step and reaching zero at $k = 13$, where
+$U_{13}U_{13}^\T = I$ reconstructs every point exactly. The test curve lies above the training
+curve for every $k < 13$, because the directions were fitted to the training points.
+
+%==============================================================================================
+\section{P3: Effect of preprocessing, and the two-dimensional projection}
+
+\paragraph{Method.} Three variants are fitted on the training set and applied unchanged to the
+test set: V1 subtracts the training mean; V2 maps each feature to $[0, 1]$ with the training
+minimum and maximum and then subtracts the training mean of the scaled feature; V3 is the
+z-score. For each one we compute $S$ and its eigendecomposition with the code of P1, project
+onto the first two components, $\cc_n = U_2^\T\x'_n$, and train a 5-nearest-neighbour classifier
+(\texttt{KNeighborsClassifier(n\_neighbors=5)}) on the training projections, scored on the test
+projections.
+
+Two facts explain the results. If one feature $j$ is multiplied by $a > 1$, then $S_{jj}$ becomes
+$a^2S_{jj}$ while the other diagonal entries stay the same, and because $\lambda_1 \ge
+\mathbf e_j^\T S\,\mathbf e_j = S_{jj}$,
+\[
+  r_1 \;\ge\; \frac{S_{jj}}{\tr(S)} = \frac{a^2S_{jj}}{a^2S_{jj} + \sum_{i\ne j}S_{ii}}
+  \;\longrightarrow\; 1 \quad (a \to \infty),
+\]
+so the leading component turns into the feature with the largest scale. For z-scored data,
+$S_{ji} = \frac{1}{N-1}\sum_n z_{nj}z_{ni} = \mathrm{Cov}(x_j, x_i)/(s_js_i) = \rho_{ji}$: $S$ is
+the correlation matrix, which does not depend on the units of measurement.
+
+\paragraph{Results.} Table~\ref{tab:p3} compares the variants and Figure~\ref{fig:p3} shows the
+three projections. For V1, the three features with the largest raw sample variance are
+\res{p3-raw-list}.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{lccclc}
+    \toprule
+    Variant & $r_1$ & $r_2$ & $r_1 + r_2$ & largest $|\text{loading}|$ on PC1 & 5-NN test accuracy \\
+    \midrule
+    \resrows{p3-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{Variance captured by the first two components, the feature that dominates PC1, and
+    the 5-NN test accuracy on the two-dimensional projection.}
+  \label{tab:p3}
+\end{table}
+
+\begin{figure}[H]
+  \centering\fig{p3_projections}
+  \caption{PC1--PC2 projections under the three preprocessing variants. Filled circles are
+    training points and crosses are test points, coloured by class.}
+  \label{fig:p3}
+\end{figure}
+
+\paragraph{Discussion.} (i) In V1, $\tr(S)$ is the sum of the raw variances and \res{p3-V1-pc1}
+alone holds $\res{p3-raw-share}$ of it, so by $r_1 \ge S_{jj}/\tr(S)$ the first component is
+essentially the \res{p3-V1-pc1} axis and $r_1 = \res{p3-V1-r1}$. V3 gives every feature variance
+1, so $S$ is the correlation matrix and $r_1 = \res{p3-V3-r1}$ measures variation shared by
+correlated features, not the units of one of them. (ii) V1 captures $\res{p3-V1-r12}$ of the
+variance in two components against $\res{p3-V3-r12}$ for V3, yet it is the worst for the
+classification check, with a 5-NN accuracy of $\res{p3-V1-acc}$ against $\res{p3-V3-acc}$: in
+Figure~\ref{fig:p3} its plane is spanned almost entirely by \res{p3-V1-pc1} and
+\res{p3-V1-pc2}, on which classes 1 and 2 overlap. Variance captured is therefore not a measure
+of useful structure, because PCA ranks directions by spread alone, a spread that depends on the
+units, while the class information can sit in features with a small raw variance. (iii) We would
+use the z-score (V3) before PCA on this data: the thirteen features have unrelated units and
+ranges, and standardising makes the components independent of those units. V2 also removes the
+unit problem and scores $\res{p3-V2-acc}$ here, but it scales each feature by its two most
+extreme training values, so it is sensitive to outliers, and its lead over V3 is only
+\res{p3-V2-lead} of the \res{p3-n-test} test samples.
+
+%==============================================================================================
+\section{P4: PCA versus feature selection for a downstream classifier}
+
+\paragraph{Method.} The classifier is the same for every feature set, a multinomial logistic
+regression, \texttt{LogisticRegression(C=1.0, max\_iter=1000)}, trained on the standardised
+training set and scored on the standardised test set. Cross-validation uses the folds of
+\texttt{StratifiedKFold(n\_splits=5, shuffle=True, random\_state=0)} on the training set, built
+once and reused. For $k \in \{1, 2, 3, 5, 8\}$ the three feature sets are
+\begin{itemize}
+  \item[(A)] \textbf{PCA}: the first $k$ principal component scores $U_k^\T\z_n$, with $U$ from
+        the training set (P1);
+  \item[(B)] \textbf{Filter}: the $k$ original features with the largest F-score
+        \[
+          F_j = \frac{\sum_{c=1}^{C}N_c\,(m_{jc} - m_j)^2\big/(C - 1)}
+                     {\sum_{c=1}^{C}\sum_{n\in c}(z_{nj} - m_{jc})^2\big/(N - C)},
+        \]
+        the between-class variance of feature $j$ over its within-class variance, computed on
+        the training set;
+  \item[(C)] \textbf{Wrapper}: sequential forward selection. Starting from the empty set, each
+        step adds the feature whose addition gives the highest mean 5-fold cross-validated
+        accuracy; candidates are tried in increasing column index and the first maximum is
+        kept.
+\end{itemize}
+The baseline is the same classifier on all 13 standardised features. Forward selection is our
+own implementation; it returns the same subsets as scikit-learn's
+\texttt{SequentialFeatureSelector} for every $k$ in the table (checked in
+\texttt{tests/test\_p4.py}). At a step where $k$ features are held it scores $D - k$ candidates,
+so running to completion would score $\sum_{k=0}^{D-1}(D - k) = D(D+1)/2 = 91$ subsets, against
+$2^{D} - 1 = 8191$ for an exhaustive search; stopping at $k = 8$ scores $13 + 12 + \dots + 6 = 76$
+subsets, each with 5 model fits.
+
+\paragraph{Results.} Table~\ref{tab:p4} and Figure~\ref{fig:p4} give the test accuracy of the
+three methods. The baseline test accuracy is $\res{p4-baseline}$ ($\res{p4-baseline-correct}$ of
+the $\res{p4-n-test}$ test samples).
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{rccc}
+    \toprule
+    $k$ & (A) PCA & (B) Filter & (C) Wrapper \\
+    \midrule
+    \resrows{p4-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{Test accuracy of the classifier on $k$ features from each method.}
+  \label{tab:p4}
+\end{table}
+
+\begin{figure}[H]
+  \centering\fig[0.72\linewidth]{p4_accuracy}
+  \caption{Test accuracy against $k$ for the three methods, with the baseline on all 13
+    features.}
+  \label{fig:p4}
+\end{figure}
+
+Table~\ref{tab:p4-f} ranks all 13 features by F-score, and Table~\ref{tab:p4-chosen} lists the
+features each selection method chooses, (B) in rank order and (C) in the order they were added.
+At $k = 3$ the two methods share \res{p4-shared-3}; at $k = 8$ they share \res{p4-shared-8}.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{rlr}
+    \toprule
+    Rank & Feature & $F_j$ \\
+    \midrule
+    \resrows{p4-f-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{F-score ranking of the 13 features, best first.}
+  \label{tab:p4-f}
+\end{table}
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{r>{\raggedright\arraybackslash}p{0.38\linewidth}%
+      >{\raggedright\arraybackslash}p{0.38\linewidth}c}
+    \toprule
+    $k$ & (B) Filter & (C) Wrapper & Shared \\
+    \midrule
+    \resrows{p4-chosen-rows}
+    \bottomrule
+  \end{tabular}
+  \caption{Features chosen by the filter and by the wrapper, and how many they share.}
+  \label{tab:p4-chosen}
+\end{table}
+
+\paragraph{Discussion.} (i) Within one test sample of the baseline, at an accuracy of at least
+$\res{p4-threshold}$, PCA arrives at \res{p4-within-pca}, the filter at \res{p4-within-filter}
+and the wrapper at \res{p4-within-wrapper}. (ii) The labels give (B) and (C) no visible advantage
+in Figure~\ref{fig:p4}: the PCA curve is on or above both at every $k$, and even at $k = 1$ one
+component found without labels ($\res{p4-first-pc-acc}$) does at least as well as
+\res{p4-first-feature}, the single feature both supervised methods pick
+($\res{p4-first-feature-acc}$). That is consistent with how the features are built: a principal
+component is a weighted sum of all thirteen features, so $k$ components draw on every feature
+while $k$ selected features draw on only $k$, and on this data the directions of largest variance
+also separate the classes (P3). The one trace of the labels is in the wrapper, whose
+cross-validated accuracy on the training set reaches $\res{p4-sfs-cv-last}$ at $k = 8$ while its
+test accuracy is the lowest of the three for every $k \ge 2$, a sign that it tunes the subset to
+the $\res{p2-n-train}$ training samples. (iii) With $\res{p4-n-test}$ test samples one sample is
+worth $\res{p4-one-sample}$ of accuracy and the binomial standard error of an accuracy near 0.95
+is about 0.03, so differences of one or two samples, such as those between PCA and the filter
+from $k = 5$ on, cannot rank the methods. Only the larger gaps at $k = 3$ (\res{p4-gap-filter-3}
+and \res{p4-gap-wrapper-3} samples between PCA and the two selection methods) point to a real
+difference, and even they come from a single train/test split.
+
+\end{document}
