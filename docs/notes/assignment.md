@@ -98,8 +98,12 @@ Pn is section n.
 6. Commit `results/`, `figures/` and `report/report.pdf`, then build the zip with the command in
    the README's Submission section.
 
+## Submission
+
+The handout gives no format, so this follows assignment 1: one zip named after the student ID,
+`2023B4A70727H_A2.zip`, built with the `git archive` command in the README's Submission section.
+The group is the same three as in assignment 1.
+
 ## Still open
 
 - The official `wine_train.csv` and `wine_test.csv`.
-- The submission format and channel. The handout gives none; assignment 1 used
-  `<StudentID>_A1.zip`, so the README's packaging command builds `2023B4A70727H_A2.zip`.
