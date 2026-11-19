@@ -93,8 +93,8 @@ colour is the class.
 ## Likely questions
 
 - *Does PCA depend on the units of the features?* Yes, unless the data is standardised first.
-  Changing proline from mg/L to g/L would change V1's components completely and leave V3's
-  untouched.
+  Dividing proline by 1000, which is only a change of units, hands V1's first component to
+  `magnesium` (r₁ = 0.9176) and leaves V3 exactly as it was.
 - *What is the difference between PCA on the covariance and on the correlation matrix?* The
   correlation matrix is the covariance matrix of z-scored data. Use it when features have
   different units.
