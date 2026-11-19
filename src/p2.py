@@ -48,7 +48,6 @@ def compute():
         "k_tau": {f"{tau:.2f}": int(KS[cumulative >= tau].min()) for tau in TAUS},
         "kaiser": int((lam > np.trace(S) / D).sum()),
         "identity_residual": float(np.abs(J_train - tail).max()),
-        "J_test_largest_increase": float(np.diff(J_test).max()),
     }
     return {"numbers": numbers}
 
@@ -70,7 +69,7 @@ def variance_figure(res):
         ELBOW, color=MUTED, linewidth=1, linestyle=":", label=f"threshold {ELBOW:.2f}"
     )
     scree.set(
-        xlabel="component j",
+        xlabel="component $j$",
         ylabel=r"explained variance ratio $r_j$",
         title="Scree plot",
         xticks=KS,
@@ -78,14 +77,14 @@ def variance_figure(res):
     scree.grid(axis="x", visible=False)
     scree.legend(handles=[bars, elbow, threshold], loc="upper right")
 
-    cumulative.plot(KS, R, color=BLUE, marker="o", label="R(k)")
+    cumulative.plot(KS, R, color=BLUE, marker="o", label="$R(k)$")
     for tau, style in zip(TAUS, (":", "--", "-."), strict=True):
         cumulative.axhline(
             tau, color=INK_2, linewidth=1, linestyle=style, label=rf"$\tau$ = {tau:.2f}"
         )
     cumulative.set(
-        xlabel="number of components k",
-        ylabel="cumulative explained variance R(k)",
+        xlabel="number of components $k$",
+        ylabel="cumulative explained variance $R(k)$",
         title="Cumulative explained variance",
         xticks=KS,
     )
@@ -113,8 +112,8 @@ def reconstruction_figure(res):
         label=rf"$J_\mathrm{{test}}(k)$, {n['n_test']} points",
     )
     ax.set(
-        xlabel="number of components k",
-        ylabel="reconstruction error J(k)",
+        xlabel="number of components $k$",
+        ylabel="reconstruction error $J(k)$",
         title="Reconstruction error against the number of components",
         xticks=KS,
     )

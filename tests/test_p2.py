@@ -29,7 +29,7 @@ def test_test_error_uses_the_test_divisor_and_never_increases():
     scores = Z_TEST @ U  # u_j^T z_n for every test point
     by_residual = [(scores[:, k:] ** 2).sum() / (len(Z_TEST) - 1) for k in p2.KS]
     np.testing.assert_allclose(n["J_test"], by_residual, atol=1e-12)
-    assert n["J_test_largest_increase"] <= 0
+    assert np.all(np.diff(n["J_test"]) <= 0)
     assert n["J_test"][-1] < 1e-20  # all 13 components reconstruct every point
 
 

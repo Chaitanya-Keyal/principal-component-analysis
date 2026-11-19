@@ -3,8 +3,6 @@
 import matplotlib as mpl
 
 # Categorical colours, always taken in this order (classes 0, 1, 2 and the three methods of P4).
-# Checked for colour-blind separation on a light surface; aqua is below 3:1 contrast, so every
-# figure that uses it carries a legend and a marker shape of its own.
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 INK, INK_2, MUTED, GRID, AXIS = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
 

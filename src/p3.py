@@ -4,6 +4,8 @@ Every variant is fitted on the training set only and applied unchanged to the te
 covariance matrix and its eigendecomposition are P1's code.
 """
 
+from collections import Counter
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
@@ -42,16 +44,23 @@ def compute():
         lam, U = eigendecomposition(covariance(A))
         r = variance_ratio(lam)
         C, C_test = A @ U[:, :2], A_test @ U[:, :2]  # c_n = U_2^T x'_n
-        knn = KNeighborsClassifier(n_neighbors=5).fit(C, y)
-        correct = int((knn.predict(C_test) == y_test).sum())
+        predicted = KNeighborsClassifier(n_neighbors=5).fit(C, y).predict(C_test)
+        wrong = predicted != y_test
+        # the pair of classes most often taken for each other, and how many errors that is
+        pairs = Counter(
+            tuple(sorted(pair)) for pair in zip(y_test[wrong], predicted[wrong], strict=True)
+        )
+        (classes, errors), *_ = pairs.most_common(1) or [((), 0)]
         variants[name] = {
             "r1": float(r[0]),
             "r2": float(r[1]),
             "r1_plus_r2": float(r[0] + r[1]),
             "pc1_feature": FEATURES[int(np.abs(U[:, 0]).argmax())],
+            "pc1_loading": float(np.abs(U[:, 0]).max()),
             "pc2_feature": FEATURES[int(np.abs(U[:, 1]).argmax())],
-            "correct": correct,
-            "accuracy": correct / len(y_test),
+            "correct": int((~wrong).sum()),
+            "accuracy": float((~wrong).mean()),
+            "most_confused": {"classes": [int(c) for c in classes], "errors": errors},
         }
         projections[name] = (C, C_test)
 
@@ -67,11 +76,11 @@ def compute():
 
 
 def projection_figure(res):
-    fig, axes = plt.subplots(1, 3, figsize=(8.8, 3.7))
-    handles = [
+    fig, axes = plt.subplots(1, 3, figsize=(7.4, 3.9))
+    handles = [  # train in the first legend column, test in the second
         Line2D([], [], linestyle="", marker=marker, color=colour, label=f"class {c}, {split}")
-        for c, colour in CLASS_COLOURS.items()
         for marker, split in (("o", "train"), ("x", "test"))
+        for c, colour in CLASS_COLOURS.items()
     ]
     for ax, (name, (label, _)) in zip(axes, VARIANTS.items(), strict=True):
         C, C_test = res["projections"][name]
@@ -84,10 +93,10 @@ def projection_figure(res):
         ax.legend(
             handles=handles,
             loc="upper center",
-            bbox_to_anchor=(0.5, -0.19),
-            ncol=3,
-            fontsize=6.5,
-            columnspacing=0.6,
+            bbox_to_anchor=(0.5, -0.2),
+            ncol=2,
+            fontsize=7.5,
+            columnspacing=0.8,
             handletextpad=0.1,
         )
     fig.tight_layout()

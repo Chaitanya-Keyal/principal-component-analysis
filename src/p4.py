@@ -74,19 +74,15 @@ def compute():
     ranking = [int(j) for j in np.argsort(-F, kind="stable")]  # best first
     sfs, sfs_scores = forward_selection(Z, y, max(K_VALUES))
 
-    def columns(method, k):  # in increasing column index, as a get_support() mask gives them
-        return sorted(ranking[:k] if method == "filter" else sfs[:k])
+    def selected(order, k):  # columns in increasing index, as a get_support() mask gives them
+        columns = sorted(order[:k])
+        return test_correct(Z[:, columns], y, Z_test[:, columns], y_test)
 
     baseline = test_correct(Z, y, Z_test, y_test)
     correct = {
         "pca": [test_correct(Z @ U[:, :k], y, Z_test @ U[:, :k], y_test) for k in K_VALUES],
-        **{
-            method: [
-                test_correct(Z[:, columns(method, k)], y, Z_test[:, columns(method, k)], y_test)
-                for k in K_VALUES
-            ]
-            for method in ("filter", "wrapper")
-        },
+        "filter": [selected(ranking, k) for k in K_VALUES],
+        "wrapper": [selected(sfs, k) for k in K_VALUES],
     }
     numbers = {
         "n_test": n_test,
@@ -139,7 +135,7 @@ def accuracy_figure(res):
         label=f"baseline, all {D} features",
     )
     ax.set(
-        xlabel="number of features k",
+        xlabel="number of features $k$",
         ylabel="test accuracy",
         title="Test accuracy against the number of features",
         xticks=K_VALUES,

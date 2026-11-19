@@ -8,7 +8,6 @@ python -m src.run --out DIR    write results/ and figures/ under DIR instead of 
 
 import argparse
 import json
-import time
 from pathlib import Path
 
 import matplotlib
@@ -34,7 +33,6 @@ def main():
     results.mkdir(parents=True, exist_ok=True)
     figures.mkdir(parents=True, exist_ok=True)
     for name in args.problems or PROBLEMS:
-        start = time.perf_counter()
         res = PROBLEMS[name].compute()
         (results / f"{name}.json").write_text(json.dumps(res["numbers"], indent=2) + "\n")
         if "stdout" in res:
@@ -44,7 +42,6 @@ def main():
             # no creation date in the PDF, so a rerun gives byte-identical files
             fig.savefig(figures / f"{fig_name}.pdf", metadata={"CreationDate": None})
             plt.close(fig)
-        print(f"{name}: {time.perf_counter() - start:.1f} s")
     report_numbers.write(results)
 
 
