@@ -1,0 +1,2 @@
+# The provided CSVs are used byte for byte as given, so git must never convert their line endings.
+data/*.csv -text
