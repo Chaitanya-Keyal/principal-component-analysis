@@ -56,7 +56,8 @@ then applied to the 54 test wines without change.
 - Standardised the 13 training features.
 - Built S ourselves (two lines of NumPy) and asked NumPy for its eigenvectors.
 - Sorted them largest first and fixed the signs. An eigenvector can point either way (u or −u),
-  so the handout's rule is: flip it so that its biggest entry is positive.
+  so the handout's rule is: flip it so that its entry of largest absolute value (the biggest
+  one, ignoring signs) is positive.
 - Printed the 13 eigenvalues: 4.6450, 2.4972, 1.4309, 0.9426, ... down to 0.0947.
 
 **The checks.**
@@ -66,8 +67,8 @@ then applied to the 54 test wines without change.
   Anything below 10⁻⁸ counts as "agree"; what is left is rounding in the 16th digit.
 
 **What the components mean.**
-- PC1 is mostly `flavanoids`, `total_phenols` and `od280/od315_of_diluted_wines`: how phenolic the
-  wine is.
+- PC1 is mostly `flavanoids`, `total_phenols` and `od280/od315_of_diluted_wines`: roughly how
+  phenolic the wine is.
 - PC2 is mostly `color_intensity`, `alcohol` and `proline`: how strong and dark it is.
 
 ---
@@ -160,8 +161,8 @@ on all 13 features: 0.9815, which is 53 of the 54 test wines.
   1.0000 at k = 3, 5 and 8) and lowest of the three on the test data (0.8704, 0.9074, 0.9630).
   It tuned its choices to the 124 training wines.
 - **How far to trust it.** One test wine is 0.0185 of accuracy. Differences of one or two wines
-  are noise. Only the gaps of four to six wines are worth mentioning: PCA ahead of the filter
-  at k = 3, PCA ahead of the wrapper at k = 3 and 5, the filter ahead of the wrapper at k = 5.
+  are noise. Only the largest gaps are worth mentioning, and the widest is 6 wines, between PCA
+  and the wrapper at k = 3.
 
 **Why a greedy search.** Trying every subset of 13 features means 8191 subsets. Forward selection
 tries 13, then 12, then 11, ...: 76 subsets to reach k = 8.
@@ -199,8 +200,8 @@ uv run --group notebook jupyter lab notebooks/demo.ipynb
   > sum. And scikit-learn's PCA, after the same sign rule, agrees with ours to about 10⁻¹⁵, far
   > below the 10⁻⁸ threshold."
 - **The loadings table:**
-  > "PC1 is led by flavanoids, total phenols and od280: the phenolic content. PC2 is led by
-  > colour intensity, alcohol and proline."
+  > "PC1 is led by flavanoids, total phenols and od280: roughly the phenolic content. PC2 is led
+  > by colour intensity, alcohol and proline."
 
 **P2 cell**
 - **Scree plot (left):**
@@ -262,7 +263,8 @@ uv run --group notebook jupyter lab notebooks/demo.ipynb
 8. **Is more variance captured always better?** No. V1 captures 99.98% in two components and
    classifies worst.
 9. **How can PCA match methods that use the labels?** Its components combine all features, and
-   on this data the directions of large variance are also the ones that separate the classes.
+   after standardising, the directions of large variance are also the ones that separate the
+   classes (unscaled, in P3's V1, they are not).
 10. **Can you rank the three methods from these results?** Not reliably. One test wine is 1.85
     percentage points, and most gaps are one or two wines. The largest is 6 wines, between PCA
     and the wrapper at k = 3.

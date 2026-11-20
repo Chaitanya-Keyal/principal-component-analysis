@@ -121,10 +121,9 @@ Forward-selection order: `flavanoids`, `alcohol`, `alcalinity_of_ash`, `proantho
    test set). It fits its choices to the 124 training wines.
 3. **How confident can we be with 54 test wines?** Not very. One wine is 1/54 = 0.0185. The
    standard error of an accuracy near 0.95 is √(0.95 × 0.05 / 54) ≈ 0.03, more than one wine.
-   Gaps of one or two wines (PCA and the filter from k = 5 on) mean nothing. Only the gaps of
-   four to six wines hint at a real difference: PCA over the filter at k = 3 (4), PCA over the
-   wrapper at k = 3 (6) and k = 5 (5), and the filter over the wrapper at k = 5 (4). Even those
-   come from a single split.
+   Gaps of one or two wines (PCA and the filter from k = 5 on) mean nothing. Only the largest
+   gaps hint at a real difference, and the widest is 6 wines, between PCA and the wrapper at
+   k = 3. Even that comes from a single split.
 
 ## Demo
 
@@ -140,12 +139,15 @@ Forward-selection order: `flavanoids`, `alcohol`, `alcalinity_of_ash`, `proantho
   extraction method builds new features as combinations of the old ones.
 - *Why can PCA beat methods that see the labels?* A component can combine several weak or
   correlated features into one strong one; a selected feature is only ever itself. It works here
-  because class differences are a large part of the total variance.
+  because, once the features are standardised, class differences are a large part of the total
+  variance.
 - *When would PCA lose?* When the direction that separates the classes has small variance. P3's
-  V1 is exactly that case: PCA on unscaled data keeps proline and loses the classes.
+  V1 is exactly that case: PCA on unscaled data keeps proline and magnesium and can no longer
+  tell classes 1 and 2 apart.
 - *Why does the wrapper do worst on the test set?* It picks whatever maximises cross-validated
-  accuracy on 124 wines, and with 76 candidates scored some of that maximum is luck. Its training
-  score (1.0000) is optimistic; the test set shows the true level.
+  accuracy on 124 wines, and with 76 candidates scored some of that maximum is luck. Its
+  cross-validated score (1.0000 at k = 8) is optimistic because the features were chosen to
+  maximise it; the test set, which played no part in the choice, gives 0.9630.
 - *Why did the wrapper's accuracy drop from k = 2 to k = 3?* It optimises the cross-validated
   accuracy, which did go up (0.9357 to 0.9517). Test accuracy is not what it sees; the change is
   one wine.
@@ -159,6 +161,12 @@ Forward-selection order: `flavanoids`, `alcohol`, `alcalinity_of_ash`, `proantho
 - *Why standardise before logistic regression?* The L2 penalty treats all coefficients alike,
   which is only fair when the features share a scale.
 - *Why does accuracy move in steps?* It is a count out of 54, so it changes by 0.0185 at a time.
+- *How would you test whether one method is really better?* With a paired test on the 54 test
+  predictions (McNemar's test), because both methods are scored on the same wines. For the
+  widest gap, PCA against the wrapper at k = 3, PCA is right on 6 wines the wrapper gets wrong
+  and the wrapper is never right where PCA is wrong. If the two were equally good, a 6 to 0
+  split would happen with probability 2 × 0.5⁶ = 0.03. That is suggestive, but it is the largest
+  of many comparisons on a single split.
 
 ## Likely code changes
 

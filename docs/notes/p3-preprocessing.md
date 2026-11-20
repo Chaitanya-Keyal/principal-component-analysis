@@ -105,9 +105,11 @@ colour is the class.
 - *Can a test value fall outside [0, 1] under V2?* Yes, if it is beyond the training minimum or
   maximum. We leave it as it is: clipping would change the data, and the handout does not ask
   for it.
-- *Why did V2 beat V3 here?* By 2 test wines. Min-max gives features with a small relative
-  spread a different weight from the z-score, which moves a few borderline points. It is within
-  the noise of 54 samples (see P4).
+- *Why did V2 beat V3 here?* By 2 test wines. Under min-max a feature's variance is
+  (standard deviation / range)², so the features do not all get the same weight as they do under
+  the z-score: `flavanoids` ends up with the largest variance (0.0789) and `ash` with the
+  smallest (0.0209). That moves a few borderline points, and 2 wines is within the noise of 54
+  samples (see P4).
 - *Why k = 5 neighbours and Euclidean distance?* They are the handout's settings; all other
   settings are scikit-learn's defaults.
 - *Is the 2-D picture enough to judge the classes?* For V3 it shows 0.5494 of the variance. The
@@ -121,5 +123,6 @@ colour is the class.
   (`plt.subplots(1, 4, ...)`).
 - Show what scaling one feature does: multiply the `hue` column of `X` and `X_test` by 10,000
   at the top of `compute`. In V1, PC1 switches from `proline` to `hue` with r₁ = 0.9832; V3 does
-  not change at all. A smaller factor is not enough: hue's raw variance is only 0.0529, so it
-  has to be scaled a long way before it passes proline's 94906.7.
+  not change at all. A factor of 1,000 is not enough (PC1 stays `proline`, r₁ = 0.6747): hue's
+  raw variance is only 0.0529, so the factor has to pass about 1,340 before a² × 0.0529 exceeds
+  proline's 94906.7.

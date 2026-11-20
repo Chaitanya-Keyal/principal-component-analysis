@@ -74,13 +74,15 @@ Eigenvalues: 4.6450, 2.4972, 1.4309, 0.9426, 0.9065, 0.6944, 0.5922, 0.3140, 0.2
 | eigenvectors vs. scikit-learn | 9.1e-15 | same |
 
 All are far below the 10⁻⁸ threshold; what is left is floating-point rounding (a computer keeps
-about 16 digits).
+about 16 digits). The digits of these residuals are rounding noise, so they can come out
+differently with another NumPy or scikit-learn version; only their size matters.
 
 Largest loadings:
 
 - **PC1:** `flavanoids` (0.4260), `total_phenols` (0.3899), `od280/od315_of_diluted_wines`
-  (0.3778). These are all measures of phenolic content, and they rise and fall together. PC1 is
-  roughly "how phenolic the wine is".
+  (0.3778). `flavanoids` and `total_phenols` measure phenolic content, and
+  `od280/od315_of_diluted_wines` rises and falls with them. PC1 is roughly "how phenolic the
+  wine is".
 - **PC2:** `color_intensity` (0.5263), `alcohol` (0.4941), `proline` (0.3703). PC2 is roughly
   "how strong and dark the wine is".
 

@@ -13,8 +13,9 @@ of the information in far fewer numbers.
 
 - **Variance** of one feature: the average squared distance from its mean. Large variance means
   the values are spread out. Its square root is the **standard deviation**.
-- **Covariance** of two features: whether they move together. Positive when one is high the other
-  tends to be high, negative when they move in opposite directions, near zero when unrelated.
+- **Covariance** of two features: whether they move together. Positive when a high value of one
+  tends to come with a high value of the other, negative when they move in opposite directions,
+  near zero when unrelated.
 - **Correlation**: covariance divided by both standard deviations. It is always between −1 and 1
   and has no units.
 - **Why N − 1 and not N.** We have a sample of 124 wines, not all wines. Dividing by N − 1 gives
@@ -73,7 +74,7 @@ matrices and returns eigenvalues in *ascending* order; we reverse them and apply
 
 ## The sign rule
 
-If u is an eigenvector, so is −u: same direction, same variance. A solver may return either, so
+If u is an eigenvector, so is −u: the same line, the same variance. A solver may return either, so
 two correct programs can disagree by a sign. The handout fixes it: flip each eigenvector so that
 its entry of largest absolute value is positive. `fix_signs(U)` does that, and it is applied to
 our U and to scikit-learn's vectors before they are compared.

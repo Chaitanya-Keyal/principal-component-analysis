@@ -77,8 +77,8 @@ Pn is section n.
   `cd report && latexmk -pdf report.tex` builds the committed `report/report.pdf`.
 - `notebooks/demo.ipynb` calls the same `compute()` and `figures()`; it is committed without
   outputs and run live.
-- `tests/test_discussion.py` states in code what the report's three discussion paragraphs say in
-  words, so `uv run pytest` confirms that every sentence holds on the provided data.
+- `tests/test_discussion.py` states in code the data-dependent claims of the report's three
+  discussion paragraphs, so `uv run pytest` fails if one of them stops holding.
 - A quick check that the files and the conventions are right: the 13 eigenvalues sum to 13.0000
   and agree with scikit-learn's to about 10⁻¹⁵ (`results/p1.json`).
 
