@@ -1,0 +1,154 @@
+{
+  "n_test": 54,
+  "baseline": {
+    "correct": 53,
+    "accuracy": 0.9814814814814815
+  },
+  "correct": {
+    "pca": [
+      47,
+      51,
+      53,
+      54,
+      53
+    ],
+    "filter": [
+      46,
+      49,
+      49,
+      53,
+      53
+    ],
+    "wrapper": [
+      46,
+      48,
+      47,
+      49,
+      52
+    ]
+  },
+  "accuracy": {
+    "pca": [
+      0.8703703703703703,
+      0.9444444444444444,
+      0.9814814814814815,
+      1.0,
+      0.9814814814814815
+    ],
+    "filter": [
+      0.8518518518518519,
+      0.9074074074074074,
+      0.9074074074074074,
+      0.9814814814814815,
+      0.9814814814814815
+    ],
+    "wrapper": [
+      0.8518518518518519,
+      0.8888888888888888,
+      0.8703703703703703,
+      0.9074074074074074,
+      0.9629629629629629
+    ]
+  },
+  "within_one": {
+    "pca": 3,
+    "filter": 5,
+    "wrapper": 8
+  },
+  "f_scores": [
+    100.34644249821793,
+    22.582802023957733,
+    11.57604656885746,
+    26.05278136748381,
+    7.112365998810689,
+    59.255802560430716,
+    187.68577711289743,
+    17.905293081958124,
+    19.97986641509733,
+    83.97929742385702,
+    72.26729691759081,
+    126.61911650894139,
+    149.43352927869105
+  ],
+  "f_ranking": [
+    "flavanoids",
+    "proline",
+    "od280/od315_of_diluted_wines",
+    "alcohol",
+    "color_intensity",
+    "hue",
+    "total_phenols",
+    "alcalinity_of_ash",
+    "malic_acid",
+    "proanthocyanins",
+    "nonflavanoid_phenols",
+    "ash",
+    "magnesium"
+  ],
+  "sfs_order": [
+    "flavanoids",
+    "alcohol",
+    "alcalinity_of_ash",
+    "proanthocyanins",
+    "magnesium",
+    "ash",
+    "hue",
+    "proline"
+  ],
+  "sfs_cv_accuracy": [
+    0.7666666666666667,
+    0.9356666666666668,
+    0.9516666666666665,
+    0.9596666666666666,
+    0.9596666666666666,
+    0.968,
+    0.984,
+    1.0
+  ],
+  "chosen": {
+    "3": {
+      "filter": [
+        "flavanoids",
+        "proline",
+        "od280/od315_of_diluted_wines"
+      ],
+      "wrapper": [
+        "flavanoids",
+        "alcohol",
+        "alcalinity_of_ash"
+      ],
+      "shared": [
+        "flavanoids"
+      ]
+    },
+    "8": {
+      "filter": [
+        "flavanoids",
+        "proline",
+        "od280/od315_of_diluted_wines",
+        "alcohol",
+        "color_intensity",
+        "hue",
+        "total_phenols",
+        "alcalinity_of_ash"
+      ],
+      "wrapper": [
+        "flavanoids",
+        "alcohol",
+        "alcalinity_of_ash",
+        "proanthocyanins",
+        "magnesium",
+        "ash",
+        "hue",
+        "proline"
+      ],
+      "shared": [
+        "flavanoids",
+        "proline",
+        "alcohol",
+        "hue",
+        "alcalinity_of_ash"
+      ]
+    }
+  }
+}

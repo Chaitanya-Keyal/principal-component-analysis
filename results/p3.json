@@ -1,0 +1,71 @@
+{
+  "n_test": 54,
+  "variants": {
+    "V1": {
+      "r1": 0.9977592845624353,
+      "r2": 0.002057523272334361,
+      "r1_plus_r2": 0.9998168078347697,
+      "pc1_feature": "proline",
+      "pc1_loading": 0.9997888458713386,
+      "pc2_feature": "magnesium",
+      "correct": 39,
+      "accuracy": 0.7222222222222222,
+      "most_confused": {
+        "classes": [
+          1,
+          2
+        ],
+        "errors": 11
+      }
+    },
+    "V2": {
+      "r1": 0.42712820682326363,
+      "r2": 0.18413810968213012,
+      "r1_plus_r2": 0.6112663165053938,
+      "pc1_feature": "flavanoids",
+      "pc1_loading": 0.5271256571995873,
+      "pc2_feature": "color_intensity",
+      "correct": 53,
+      "accuracy": 0.9814814814814815,
+      "most_confused": {
+        "classes": [
+          1,
+          2
+        ],
+        "errors": 1
+      }
+    },
+    "V3": {
+      "r1": 0.35730452901251736,
+      "r2": 0.1920916409490762,
+      "r1_plus_r2": 0.5493961699615936,
+      "pc1_feature": "flavanoids",
+      "pc1_loading": 0.42596901442270163,
+      "pc2_feature": "color_intensity",
+      "correct": 51,
+      "accuracy": 0.9444444444444444,
+      "most_confused": {
+        "classes": [
+          0,
+          1
+        ],
+        "errors": 2
+      }
+    }
+  },
+  "raw_variance": [
+    {
+      "feature": "proline",
+      "variance": 94906.7109231576
+    },
+    {
+      "feature": "magnesium",
+      "variance": 232.07153160241273
+    },
+    {
+      "feature": "alcalinity_of_ash",
+      "variance": 11.471279176501444
+    }
+  ],
+  "raw_variance_share": 0.9973387520817892
+}
