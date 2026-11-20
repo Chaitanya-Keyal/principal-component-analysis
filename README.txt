@@ -12,10 +12,11 @@ Report
   Repository: https://github.com/Chaitanya-Keyal/principal-component-analysis
 
 Versions used
-  Python 3.12.10, numpy 2.5.5, matplotlib 3.11.2, scikit-learn 1.9.1. The code imports only
-  these, threadpoolctl (installed with scikit-learn) and the Python standard library. It also
-  runs on numpy 1.26, matplotlib 3.8 and scikit-learn 1.5, with every 4-decimal number unchanged;
-  only the residuals near 1e-15, which rounding alone sets, come out with different digits.
+  Python 3.12.10, numpy 2.5.5, matplotlib 3.11.2, scikit-learn 1.9.1. src/ and tests/ import
+  only these, threadpoolctl (installed with scikit-learn) and the Python standard library; the
+  notebook also needs JupyterLab. The code also runs on numpy 1.26, matplotlib 3.8 and
+  scikit-learn 1.5, with every 4-decimal number unchanged; only the residuals near 1e-15, which
+  rounding alone sets, come out with different digits.
 
 How to run
   From this folder, with uv (uv.lock pins every version):
@@ -24,6 +25,7 @@ How to run
     uv run python -m src.run          all four problems, a few seconds
     uv run python -m src.run p2 p3    some of them
     uv run pytest                     34 tests against hand-worked values and scikit-learn
+    uv run --group notebook jupyter lab notebooks/demo.ipynb     the demo (adds JupyterLab)
 
   or, with any Python 3.12+ that has numpy, matplotlib and scikit-learn: python -m src.run
 
