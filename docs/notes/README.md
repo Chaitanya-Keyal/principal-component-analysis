@@ -23,9 +23,3 @@ Every problem file opens with an In short, then follows the same order: the idea
 the maths, the code, our numbers, the demo, likely questions with answers, and the code changes
 most likely to be asked for (with where to make them). A change is best run in the notebook or
 with `src.run --out /tmp/demo`, so that the repo's results and figures are not overwritten.
-
-**The numbers are provisional.** The course has not released `wine_train.csv` and
-`wine_test.csv` yet. Every number in these notes comes from a provisional 124/54 split of the
-same 178 wines, kept outside the repo. The ideas and the code do not change; the numbers will
-move a little once the official files are in, and [assignment.md](assignment.md) lists what to
-redo then.

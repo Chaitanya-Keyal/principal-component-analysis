@@ -1,8 +1,8 @@
 # The whole assignment in plain language
 
 Part 1 explains every idea without assuming anything. Part 2 is a script for showing the
-notebook, and ten likely questions with short answers. The numbers are from our run (see the
-note on provisional numbers in [README.md](README.md)).
+notebook, and ten likely questions with short answers. Every number is from our run on the
+provided data, so it can be quoted.
 
 ---
 

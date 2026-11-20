@@ -21,15 +21,18 @@ src/p1.py ... src/p4.py      one module per problem: compute() for the numbers, 
 src/run.py                   runs the problems and writes results/ and figures/
 src/report_numbers.py        results/*.json -> results/numbers.tex, the numbers the report quotes
 results/                     p1.json ... p4.json (every reported number), p1.txt (the printed
-                             eigenvalues) and numbers.tex; written by src.run
-figures/                     every figure, as figures/<name>.pdf; written by src.run
+                             eigenvalues) and numbers.tex
+figures/                     every figure, as figures/<name>.pdf
 tests/                       checks of each problem against hand-worked values and scikit-learn
-report/report.tex            the write-up; numbers and figures come in from results/ and figures/
+report/                      report.tex, the write-up, and report.pdf built from it
 notebooks/demo.ipynb         the demo: each problem's figures and key numbers, by calling src/
 docs/notes/                  study notes: the ideas in plain language, the maths, the code, the demo
 README.txt                   the submission's readme: group, versions, how to run, open choices
 pyproject.toml, uv.lock      dependencies; .python-version pins Python 3.12
 ```
+
+`results/`, `figures/` and `report/report.pdf` are committed outputs of `python -m src.run` and
+latexmk.
 
 ## 2. Environment
 
@@ -47,7 +50,7 @@ uv run ruff format . && uv run ruff check .
 
 ## 3. Data
 
-The two files the assignment provides go in `data/` unchanged:
+`data/` holds the two files the assignment provides, unchanged:
 
 ```
 wine_train.csv               N = 124     fits every statistic, eigenvector and feature score
@@ -56,8 +59,7 @@ wine_test.csv                N = 54      only transformed and scored, never used
 
 Each has the 13 feature columns in the handout's order (`alcohol` ... `proline`) and then an
 integer `class` in {0, 1, 2}. The loader checks the header and stops if the columns differ.
-Nothing in this repo generates or modifies data. Setting `WINE_DATA_DIR` reads the two files
-from another folder instead.
+Nothing in this repo generates or modifies data.
 
 ## 4. Running
 

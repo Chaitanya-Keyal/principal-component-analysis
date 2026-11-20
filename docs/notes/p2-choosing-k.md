@@ -114,6 +114,17 @@ def reconstruction_error(Z, U_k):
 One row checked by hand: J_train(1) = 13 − 4.6450 = 8.3550, and 8.3550 / 13 = 0.6427 =
 1 − 0.3573.
 
+How close the calls are. Several of the choices sit near their thresholds, so a slightly
+different sample of wines could move them by one:
+
+| Choice | Value | Threshold | Margin |
+|---|---|---|---|
+| k_elbow = 3 | r₃ = 0.1101 | 0.10 | above by 0.0101 |
+| k₀.₈₀ = 5 | R(5) = 0.8017 | 0.80 | above by 0.0017 |
+| k₀.₉₀ = 7 | R(7) = 0.9007 | 0.90 | above by 0.0007 |
+| k₀.₉₅ = 10 | R(9) = 0.9452 | 0.95 | below by 0.0048 |
+| Kaiser count = 3 | λ₄ = 0.9426 | 1 | below by 0.0574 |
+
 ## Demo
 
 1. `uv run python -m src.run p2 --out /tmp/demo`, then open `p2_variance.pdf` (scree plot with

@@ -72,38 +72,18 @@ Pn is section n.
 - `data/`: the two CSVs, unchanged.
 - `uv run python -m src.run` writes `results/<p>.json`, `results/p1.txt` (the printed
   eigenvalues), `results/numbers.tex` (the same numbers as LaTeX macros) and
-  `figures/<name>.pdf`.
+  `figures/<name>.pdf`; all of them are committed.
 - `report/report.tex` reads every number through `\res{key}` and every figure from `figures/`;
-  `cd report && latexmk -pdf report.tex` builds `report/report.pdf`.
+  `cd report && latexmk -pdf report.tex` builds the committed `report/report.pdf`.
 - `notebooks/demo.ipynb` calls the same `compute()` and `figures()`; it is committed without
   outputs and run live.
-
-## When the CSVs arrive
-
-1. Copy the two files into `data/` unchanged and commit them. If the loader stops with
-   "expected the 13 features then class", the file layout differs from the handout's; fix
-   `src/common/data.py`, not the file.
-2. `uv run python -m src.run`, then `uv run pytest`. The tests in `tests/test_discussion.py`
-   state what the report's three discussion paragraphs say in words. Each one that fails names a
-   sentence to rewrite for the real numbers; update the test with the sentence.
-3. The borderline values to look at first, with their margins on the provisional split:
-   r₃ against the 0.10 elbow threshold (above by 0.0101), R(5) against 0.80 (above by 0.0017),
-   R(7) against 0.90 (above by 0.0007), R(9) against 0.95 (below by 0.0048) and λ₄ against the
-   Kaiser threshold 1 (below by 0.0574). So k_elbow, the three k_τ and the Kaiser count can each
-   move by one.
-4. Rebuild the report (`cd report && latexmk -pdf report.tex`), read the three discussion
-   paragraphs against the new tables and figures, and check
-   `pdftotext report/report.pdf - | grep -c '??'` prints 0.
-5. Refresh the numbers in these notes and the test count in `README.txt`.
-6. Commit `results/`, `figures/` and `report/report.pdf`, then build the zip with the command in
-   the README's Submission section.
+- `tests/test_discussion.py` states in code what the report's three discussion paragraphs say in
+  words, so `uv run pytest` confirms that every sentence holds on the provided data.
+- A quick check that the files and the conventions are right: the 13 eigenvalues sum to 13.0000
+  and agree with scikit-learn's to about 10⁻¹⁵ (`results/p1.json`).
 
 ## Submission
 
 The handout gives no format, so this follows assignment 1: one zip named after the student ID,
 `2023B4A70727H_A2.zip`, built with the `git archive` command in the README's Submission section.
 The group is the same three as in assignment 1.
-
-## Still open
-
-- The official `wine_train.csv` and `wine_test.csv`.
