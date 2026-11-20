@@ -254,7 +254,8 @@ eigenvalue satisfies $\lambda'_1 \ge \mathbf e_j^\T S'\mathbf e_j = S'_{jj}$, so
   r'_1 \;\ge\; \frac{S'_{jj}}{\tr(S')} = \frac{a^2S_{jj}}{a^2S_{jj} + \sum_{i\ne j}S_{ii}}
   \;\longrightarrow\; 1 \quad (a \to \infty),
 \]
-and the leading component turns into the feature with the largest scale. For z-scored data,
+and the leading component aligns with the axis of feature $j$, the one with the largest scale.
+For z-scored data,
 $S_{ji} = \frac{1}{N-1}\sum_n z_{nj}z_{ni} = \mathrm{Cov}(x_j, x_i)/(s_js_i) = \rho_{ji}$: $S$ is
 the correlation matrix, which does not depend on the units of measurement.
 
@@ -284,21 +285,21 @@ three projections. For V1, the three features with the largest raw sample varian
 \end{figure}
 
 \paragraph{Discussion.} (i) In V1, $\tr(S)$ is the sum of the raw variances and \res{p3-V1-pc1}
-alone holds $\res{p3-raw-share}$ of it, so the bound $r_1 \ge S_{jj}/\tr(S)$ pushes $r_1$ to
-$\res{p3-V1-r1}$ and PC1 is the \res{p3-V1-pc1} axis (loading $\res{p3-V1-pc1-loading}$). V3
-gives every feature variance 1, so $S$ is the correlation matrix and $r_1 = \res{p3-V3-r1}$
-reflects variation shared by correlated features instead of the units of one of them. (ii) V1
-captures $\res{p3-V1-r12}$ of the variance in two components against $\res{p3-V3-r12}$ for V3,
-yet it is the worst for the classification check, with a 5-NN accuracy of $\res{p3-V1-acc}$
-against $\res{p3-V3-acc}$. Its plane is that of \res{p3-V1-pc1} and \res{p3-V1-pc2}, where classes
-\res{p3-V1-confused} overlap in Figure~\ref{fig:p3} (\res{p3-V1-confused-errors} of its
-\res{p3-V1-errors} test errors confuse them), so variance captured is not the same as useful
-structure, because PCA ranks directions by a spread that depends on the units. (iii) We would use
-the z-score (V3) before PCA on this data, because the thirteen features have unrelated units and
-ranges and standardising makes the components independent of them. V2 also removes the unit
-problem and scores $\res{p3-V2-acc}$ here, but it sets each feature's scale from its two most
-extreme training values and its lead over V3 is only \res{p3-V2-lead} of the \res{n-test} test
-samples.
+alone holds $\res{p3-raw-share}$ of it, so the bound $r_1 \ge S_{jj}/\tr(S)$ gives
+$r_1 \ge \res{p3-raw-share}$ (the value is $\res{p3-V1-r1}$) and PC1 is the \res{p3-V1-pc1} axis
+(loading $\res{p3-V1-pc1-loading}$). V3 gives every feature variance 1, so $S$ is the correlation
+matrix and $r_1 = \res{p3-V3-r1}$ reflects variation shared by correlated features instead of the
+units of one of them. (ii) V1 captures $\res{p3-V1-r12}$ of the variance in two components
+against $\res{p3-V3-r12}$ for V3, yet it is the worst for the classification check, with a 5-NN
+accuracy of $\res{p3-V1-acc}$ against $\res{p3-V3-acc}$. Its plane is that of \res{p3-V1-pc1} and
+\res{p3-V1-pc2}, where classes \res{p3-V1-confused} overlap in Figure~\ref{fig:p3}
+(\res{p3-V1-confused-errors} of its \res{p3-V1-errors} test errors are between these two
+classes), so variance captured is not the same as useful structure, because PCA ranks directions
+by a spread that depends on the units. (iii) We would use the z-score (V3) before PCA on this
+data, because the thirteen features have unrelated units and ranges and standardising makes the
+components independent of them. V2 also removes the unit problem and scores $\res{p3-V2-acc}$
+here, but it sets each feature's scale from its two most extreme training values and its lead
+over V3 is only \res{p3-V2-lead} of the \res{n-test} test samples.
 
 %==============================================================================================
 \section{P4: PCA versus feature selection for a downstream classifier}
@@ -388,20 +389,21 @@ At $k = 3$ the two methods share \res{p4-shared-3}; at $k = 8$ they share \res{p
   \label{tab:p4-chosen}
 \end{table}
 
-\paragraph{Discussion.} (i) Within one test sample of the baseline, at an accuracy of at least
-$\res{p4-threshold}$, PCA arrives at \res{p4-within-pca}, the filter at \res{p4-within-filter}
-and the wrapper at \res{p4-within-wrapper}. (ii) The labels give (B) and (C) no visible advantage
-in Figure~\ref{fig:p4}, where the PCA curve is on or above both at every $k$. That fits how the
-features are built, since a principal component combines all thirteen features while a selected
-feature is only itself, and on this data the directions of largest variance also separate the
-classes (P3). What is consistent with the labels being used is the wrapper's curve, the lowest of
-the three from $k = 2$ on although its cross-validated accuracy on the training set is higher
-(\res{p4-wrapper-cv} at $k =$ \res{p4-wrapper-k}, against \res{p4-wrapper-test} on the test
-set), a sign that it fits its choices to the $\res{n-train}$ training samples. (iii) With
-$\res{n-test}$ test samples one sample is worth $\res{p4-one-sample}$ of accuracy and the
-binomial standard error of an accuracy of $\res{p4-se-at}$ is $\res{p4-se}$, so differences of
-one or two samples cannot rank the methods. Only the largest gaps, up to \res{p4-gap} samples
-between \res{p4-gap-methods} at $k = \res{p4-gap-k}$, hint at a real difference, and they come
-from a single train/test split.
+\paragraph{Discussion.} (i) The smallest $k$ in the table at which each method is within one test
+sample of the baseline, an accuracy of at least $\res{p4-threshold}$, is \res{p4-within-pca} for
+PCA, \res{p4-within-filter} for the filter and \res{p4-within-wrapper} for the wrapper. (ii) The
+labels give (B) and (C) no visible advantage in Figure~\ref{fig:p4}, where the PCA curve is on or
+above both at every $k$. That fits how the features are built, since a principal component
+combines all thirteen features while a selected feature is only itself, and on the standardised
+data the directions of largest variance also separate the classes (panel V3 of
+Figure~\ref{fig:p3}). What is consistent with the labels being used is the wrapper's curve, the
+lowest of the three from $k = 2$ on, although its cross-validated accuracy on the training set is
+higher than its test accuracy (\res{p4-wrapper-cv} at $k =$ \res{p4-wrapper-k}, against
+\res{p4-wrapper-test}), a sign that it fits its choices to the $\res{n-train}$ training samples.
+(iii) With $\res{n-test}$ test samples one sample is worth $\res{p4-one-sample}$ of accuracy and
+the binomial standard error at a true accuracy of $\res{p4-se-at}$ is $\res{p4-se}$, so
+differences of one or two samples cannot rank the methods. Only the largest gaps, up to
+\res{p4-gap} samples between \res{p4-gap-methods} at $k = \res{p4-gap-k}$, hint at a real
+difference, and they come from a single train/test split.
 
 \end{document}
