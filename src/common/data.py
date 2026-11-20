@@ -1,12 +1,10 @@
 """The two provided CSV files: 13 feature columns in the handout's order, then the class."""
 
-import os
 from pathlib import Path
 
 import numpy as np
 
-# WINE_DATA_DIR reads the two files from another folder instead of data/.
-DATA_DIR = Path(os.environ.get("WINE_DATA_DIR", Path(__file__).resolve().parents[2] / "data"))
+DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 TRAIN, TEST = "wine_train.csv", "wine_test.csv"  # N = 124 and N = 54
 FEATURES = (
     "alcohol",
